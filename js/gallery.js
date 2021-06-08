@@ -52,3 +52,22 @@ function onBoxClick(evt) {
   //2.6.на этого найденного предка добавляем класс
   parentEl.classList.add("is-active");
 }
+const openModalBtn = document.querySelector('[data-action="close-lightbox"]');
+openModalBtn.addEventListener("click", onOpenModal);
+penModalBtn.addEventListener("click", onCloseModal);
+
+function onOpenModal(evt) {
+  evt.preventDefault();
+  if (evt.target.nodeName !== "IMG") {
+    return;
+    document.body.classList.add("is-open");
+  }
+}
+
+function onCloseModal() {
+  evt.preventDefault();
+  if (evt.target.nodeName === "IMG") {
+    return;
+    document.body.classList.remove("is-open");
+  }
+}
