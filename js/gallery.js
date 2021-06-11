@@ -1,6 +1,5 @@
 import images from "./gallery-items.js";
 
-//1.2.зарендерим разметку в контейнер galleryBox ч/з insertAdjacentHTML в ul
 const galleryBox = document.querySelector(".js-gallery");
 const imgMarkup = createGallery(images);
 const overlayBox = document.querySelector(".js-gallery");
