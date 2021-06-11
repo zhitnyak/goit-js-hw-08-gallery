@@ -3,15 +3,17 @@ import images from "./gallery-items.js";
 //1.2.зарендерим разметку в контейнер galleryBox ч/з insertAdjacentHTML в ul
 const galleryBox = document.querySelector(".js-gallery");
 const imgMarkup = createGallery(images);
+const overlayBox = document.querySelector(".js-gallery");
+const modalBox = document.querySelector(".js-lightbox");
+const imgModal = document.querySelector(".lightbox__image");
+const buttonClose = document.querySelector('[data-action="close-lightbox"]');
+
+galleryBox.addEventListener("click", onOpenModal);
+buttonClose.addEventListener("click", onCloseModal);
 
 galleryBox.insertAdjacentHTML("beforeend", imgMarkup);
 
-//2.1вешаем на на контейнер слушателя
-galleryBox.addEventListener("click", onBoxClick);
-
-//1создаем разметку, заполняем HTML шаблон
 function createGallery(images) {
-  //1.1.возвращаем карточку с разметкой
   return images
     .map(({ preview, original, description }) => {
       return `
@@ -31,43 +33,63 @@ function createGallery(images) {
     })
     .join("");
 }
-//2.реализуем делегирование
-function onBoxClick(evt) {
-  //2.1.если это не элемент gallery__image, то мы выходит их ф-ции
-  const ImgEl = evt.target.classList.contains(".gallery__image");
-  if (!ImgEl) {
-    return;
-  }
-  //2.2.теперь нужно найти и выбрать текущее изображение (сначала нужно снять активный класс - т.к он может быть уже выбран)
-  const currentActivEl = document.querySelector(".gallery__item.is-active");
-  //2.3.пишем услоевие - если есть такой класс, то удаляем его
-  if (currentActivEl) {
-    currentActivEl.classlist.remove("is-active");
-  }
-
-  //2.4.исходный эл-т, на котором произошло событие
-  const galeryEl = evt.target;
-  //2.5.ищем предка с аналогичным селектором
-  const parentEl = galeryEl.closest(".gallery__item");
-  //2.6.на этого найденного предка добавляем класс
-  parentEl.classList.add("is-active");
-}
-const openModalBtn = document.querySelector('[data-action="close-lightbox"]');
-openModalBtn.addEventListener("click", onOpenModal);
-penModalBtn.addEventListener("click", onCloseModal);
 
 function onOpenModal(evt) {
+  const galeryEl = evt.target;
   evt.preventDefault();
-  if (evt.target.nodeName !== "IMG") {
+  if (galeryEl.nodeName !== "IMG") {
     return;
-    document.body.classList.add("is-open");
+  }
+
+  imgModal.src = galeryEl.dataset.source;
+  imgModal.alt = galeryEl.alt;
+  modalBox.classList.add("is-open");
+
+  overlayBox.addEventListener("click", modalCloseOverlayClick);
+  window.addEventListener("keydown", modalCloseEscClick);
+  window.addEventListener("keydown", scrolling);
+  buttonClose.addEventListener("click", onCloseModal);
+}
+
+function onCloseModal(evt) {
+  modalBox.classList.remove("is-open");
+  overlayBox.removeEventListener("click", modalCloseOverlayClick);
+  window.removeEventListener("keydown", modalCloseEscClick);
+  buttonClose.removeEventListener("click", onCloseModal);
+  imgModal.src = "";
+  imgModal.alt = "";
+}
+
+function modalCloseEscClick(evt) {
+  if (evt.code === "Escape") {
+    onCloseModal(evt);
   }
 }
 
-function onCloseModal() {
-  evt.preventDefault();
-  if (evt.target.nodeName === "IMG") {
-    return;
-    document.body.classList.remove("is-open");
+function modalCloseOverlayClick(evt) {
+  if (evt.currentTarget === evt.target) {
+    onCloseModal(evt);
   }
+}
+const img = document.querySelectorAll(".gallery__image");
+const arrayImages = [];
+
+img.forEach((el) => {
+  arrayImages.push(el.getAttribute("data-source"));
+});
+function scrolling(evt) {
+  let newIndex;
+  const currentId = arrayImages.indexOf(imgModal.src);
+  if (evt.key === "ArrowLeft") {
+    newIndex = currentId - 1;
+    if (newIndex == -1) {
+      newIndex = arrayImages.length - 1;
+    }
+  } else if (evt.key === "ArrowRight") {
+    newIndex = currentId + 1;
+    if (newIndex === arrayImages.length) {
+      newIndex = 0;
+    }
+  }
+  imgModal.src = arrayImages[newIndex];
 }
