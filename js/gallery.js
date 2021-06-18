@@ -2,7 +2,7 @@ import images from "./gallery-items.js";
 
 const galleryBox = document.querySelector(".js-gallery");
 const imgMarkup = createGallery(images);
-const overlayBox = document.querySelector(".js-gallery");
+const overlayBox = document.querySelector(".lightbox__overlay");
 const modalBox = document.querySelector(".js-lightbox");
 const imgModal = document.querySelector(".lightbox__image");
 const buttonClose = document.querySelector('[data-action="close-lightbox"]');
@@ -46,7 +46,7 @@ function onOpenModal(evt) {
 
   overlayBox.addEventListener("click", modalCloseOverlayClick);
   window.addEventListener("keydown", modalCloseEscClick);
-  window.addEventListener("keydown", scrolling);
+  document.addEventListener("keydown", scrolling);
   buttonClose.addEventListener("click", onCloseModal);
 }
 
@@ -70,10 +70,10 @@ function modalCloseOverlayClick(evt) {
     onCloseModal(evt);
   }
 }
-const img = document.querySelectorAll(".gallery__image");
+const image = document.querySelectorAll(".gallery__image");
 const arrayImages = [];
 
-img.forEach((el) => {
+image.forEach((el) => {
   arrayImages.push(el.getAttribute("data-source"));
 });
 function scrolling(evt) {
